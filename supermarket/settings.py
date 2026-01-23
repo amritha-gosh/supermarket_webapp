@@ -2,6 +2,9 @@
 Django settings for supermarket project.
 """
 import os
+SETUP_TOKEN = os.environ.get("SETUP_TOKEN")
+
+
 from dotenv import load_dotenv
 load_dotenv()
 
