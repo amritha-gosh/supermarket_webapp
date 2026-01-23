@@ -38,4 +38,5 @@ path("setup/seed-stores/", views.seed_stores, name="seed_stores"),
 
 
 
+
 ]
