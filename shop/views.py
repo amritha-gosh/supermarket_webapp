@@ -518,27 +518,3 @@ def change_store_in_nav(request):
 
 
 
-from django.http import HttpResponse
-from django.conf import settings
-from .models import Store
-
-def seed_stores(request):
-    token = request.GET.get("token")
-    expected = getattr(settings, "SETUP_TOKEN", None)
-
-    if not expected or token != expected:
-        return HttpResponse("Forbidden", status=403)
-
-    created = 0
-    stores = [
-        {"key": "wigan", "name": "Wigan", "active": True},
-        {"key": "southport", "name": "Southport", "active": True},
-    ]
-
-    for data in stores:
-        obj, was_created = Store.objects.get_or_create(key=data["key"], defaults=data)
-        if was_created:
-            created += 1
-
-    return HttpResponse(f"Done. Created {created} stores.")
-

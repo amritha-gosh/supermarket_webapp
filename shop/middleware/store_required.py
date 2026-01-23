@@ -3,7 +3,6 @@ from django.urls import reverse
 
 EXEMPT_URLS = [
     '/select-store/',
-    '/setup/seed-stores/', 
     '/admin/',
     '/static/',  # allows static assets to load
 ]

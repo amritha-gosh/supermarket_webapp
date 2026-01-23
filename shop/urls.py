@@ -33,8 +33,6 @@ urlpatterns = [
  path('test-stripe/', views.test_stripe_checkout, name='test_stripe'),
   path('select-store/', views.select_store, name='select_store'),
 path('change-store/', views.change_store_in_nav, name='change_store_in_nav'),
-path("setup/seed-stores/", views.seed_stores, name="seed_stores"),
-
 
 
 
