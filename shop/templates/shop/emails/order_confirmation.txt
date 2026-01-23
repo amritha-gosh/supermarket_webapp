@@ -1,0 +1,22 @@
+Hi {{ order.email }},
+Thank you for your order #{{ order.id }}!
+
+Customer Details
+
+Name: {{ order.first_name }} {{ order.last_name }}
+Address: {{ order.address }} {{ order.address2 }}
+City: {{ order.city }}
+Postcode: {{ order.postcode }}
+Phone: {{ order.phone }}
+Email: {{ order.email }}
+Notes: {{ order.notes }}
+
+Order details:
+{% for item in order.items.all %}
+- {{ item.product.name }} x{{ item.quantity }} = £{{ item.price|floatformat:2 }}
+{% endfor %}
+Total: £{{ order.total_amount|floatformat:2 }}
+
+We'll notify you when your order status changes.
+
+Spicexpress Team.

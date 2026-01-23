@@ -1,0 +1,206 @@
+{% extends 'shop/base.html' %}
+{% block title %}Your Cart | Spicexpress{% endblock %}
+
+{% block content %}
+<style>
+  .cart-table th, .cart-table td { vertical-align: middle; }
+  .cart-banner { background: #fff6e7; color: #c97c00; font-weight: 600; border-radius: 7px;
+                 margin-bottom: 20px; padding: 12px 18px; }
+  .cart-product-img { width: 70px; border-radius: 12px; box-shadow: 0 2px 8px #efefef; }
+  .cart-totals-box { background: #fff; border-radius: 14px; box-shadow: 0 2px 14px #ece9e3a0;
+                     padding: 32px 26px; }
+  .postcode-status { font-weight: 600; margin-top: 8px; }
+  .btn-inactive { opacity: 0.7; pointer-events: none; background: #bbb !important;
+                 border-color: #bbb !important; }
+</style>
+
+<div class="container py-5">
+  <h1 class="mb-4" style="font-family:'Montserrat';font-weight:700;">
+    Your Shopping Cart
+  </h1>
+
+  {% if total < min_order %}
+    <div class="cart-banner">
+      You need at least &pound;{{ min_order|floatformat:2 }} to checkout. 
+      Your current total is &pound;{{ total|floatformat:2 }}.
+    </div>
+  {% endif %}
+
+  <div class="table-responsive mb-4">
+    <table class="table cart-table align-middle">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th style="width:120px;">Quantity</th>
+          <th style="width:120px;">Subtotal</th>
+          <th style="width:60px;">Remove</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in cart_items %}
+          <tr>
+            <td>
+              <img src="{{ item.product.image.url }}" alt="" class="cart-product-img me-2">
+              <b>{{ item.product.name }}</b>
+              {% for err in stock_errors %}
+                {% if err.product_id == item.product.id %}
+                  <div class="text-danger small">{{ err.message }}</div>
+                {% endif %}
+              {% endfor %}
+            </td>
+            <td>
+              <form method="post" action="{% url 'update_cart' item.product.id %}" class="d-inline">
+                {% csrf_token %}
+                <div class="input-group">
+                  <input type="number" name="quantity" value="{{ item.quantity }}" min="1"
+                         class="form-control" style="max-width:68px;">
+                  <button type="submit" class="btn btn-info"><i class="fa fa-refresh"></i></button>
+                </div>
+              </form>
+            </td>
+            <td>&pound;{{ item.subtotal|floatformat:2 }}</td>
+            <td>
+              <form method="post" action="{% url 'remove_from_cart' item.product.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4" class="text-center text-muted py-5">
+              Your cart is empty.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {# Discount Code #}
+  <form method="post" action="{% url 'cart' %}">
+    {% csrf_token %}
+    <div class="mb-4">
+      <div class="input-group" style="max-width:340px;">
+        <input type="text" name="discount_code" class="form-control"
+               placeholder="Discount code" value="{{ code }}">
+        <button type="submit" class="btn btn-dark">Apply</button>
+      </div>
+      {% if discount %}
+        <div class="text-success fw-bold mt-2">
+          Discount applied &minus;&pound;{{ discount|floatformat:2 }}
+        </div>
+      {% endif %}
+    </div>
+  </form>
+
+  {# Totals and Checkout #}
+  <div class="row">
+    <div class="col-lg-5 ms-auto">
+      <div class="cart-totals-box">
+        <h4 class="mb-3">Cart totals</h4>
+
+        <div class="d-flex justify-content-between mb-2">
+          <span>Subtotal:</span>
+          <b>&pound;{{ total|floatformat:2 }}</b>
+        </div>
+
+        {% if out_of_stock %}
+          <div class="alert alert-danger">
+            Some items aren’t in stock at your chosen store. Please adjust quantities or change store.
+          </div>
+        {% endif %}
+
+        <div class="mb-3">
+          <label for="postcode" class="form-label">Delivery Postcode</label>
+          <form id="postcodeCheckForm" autocomplete="off" onsubmit="return false;">
+            <div class="input-group">
+              <input type="text" id="postcode" class="form-control"
+                     placeholder="Enter postcode" maxlength="8" style="text-transform:uppercase;">
+              <button type="submit" class="btn btn-outline-primary">Check</button>
+            </div>
+          </form>
+          <div id="postcodeStatus" class="postcode-status"></div>
+        </div>
+
+        <div class="d-flex justify-content-between mb-3">
+          <span>Total:</span>
+          <b>&pound;{{ total|floatformat:2 }}</b>
+        </div>
+
+        <form id="checkoutForm" method="post" action="{% url 'checkout' %}">
+          {% csrf_token %}
+          <input type="hidden" name="postcode" id="hiddenPostcode">
+          <button type="submit"
+                  id="proceedCheckoutBtn"
+                  class="btn btn-success w-100 btn-lg{% if total < min_order or out_of_stock %} btn-inactive{% endif %}"
+                  {% if total < min_order or out_of_stock %}disabled{% endif %}>
+            Proceed to Checkout
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let isDeliverable = false;
+  const minOrder = {{ min_order }};
+  const cartTotal = parseFloat('{{ total|floatformat:2 }}');
+  const selectedStoreKey = '{{ store_key }}'.toLowerCase();
+
+  function updateButton() {
+    const btn = document.getElementById('proceedCheckoutBtn');
+    btn.disabled = (cartTotal < minOrder || !isDeliverable);
+    btn.classList.toggle('btn-inactive', cartTotal < minOrder || !isDeliverable);
+  }
+
+  document.getElementById('postcodeCheckForm')
+    .addEventListener('submit', e => {
+      e.preventDefault();
+      const pc = document.getElementById('postcode').value.trim();
+      const status = document.getElementById('postcodeStatus');
+
+      if (!pc) {
+        status.innerHTML = '<span class="text-danger">Enter a postcode.</span>';
+        isDeliverable = false;
+        updateButton();
+        return;
+      }
+
+      status.innerHTML = '<span class="text-secondary">Checking…</span>';
+
+      fetch("{% url 'ajax_validate_postcode' %}?postcode=" + encodeURIComponent(pc))
+        .then(r => r.json())
+        .then(data => {
+          if (!data.valid) {
+            status.innerHTML = `<span class="text-danger">${data.message || 'No delivery to your area.'}</span>`;
+            isDeliverable = false;
+            document.getElementById('hiddenPostcode').value = '';
+          } else if (data.store_key.toLowerCase() !== selectedStoreKey) {
+            status.innerHTML = `<span class="text-danger">❌ This postcode is outside the delivery area for {{ store_key|title }}. Please change your store.</span>`;
+            isDeliverable = false;
+            document.getElementById('hiddenPostcode').value = '';
+          } else {
+            status.innerHTML = `<span class="text-success">✅ Delivery available from <b>${data.store}</b>.</span>`;
+            isDeliverable = true;
+            document.getElementById('hiddenPostcode').value = pc;
+          }
+          updateButton();
+        })
+        .catch(() => {
+          status.innerHTML = '<span class="text-danger">Could not verify postcode.</span>';
+          isDeliverable = false;
+          updateButton();
+        });
+    });
+
+  document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+    if (!isDeliverable) {
+      e.preventDefault();
+      document.getElementById('postcodeStatus').innerHTML =
+        '<span class="text-danger">Please check your postcode for delivery before proceeding.</span>';
+    }
+  });
+</script>
+{% endblock %}

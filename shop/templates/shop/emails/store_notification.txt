@@ -1,0 +1,20 @@
+Hello {{ order.store_name }} Team,
+
+You have received a new order (#{{ order.id }}).
+
+Customer: {{ order.first_name }} {{ order.last_name }}
+Phone: {{ order.phone }}
+Email: {{ order.email }}
+Total: £{{ order.total_amount }}
+
+Delivery Address:
+{{ order.address }}
+{{ order.address2 }}
+{{ order.city }} - {{ order.postcode }}
+
+Notes:
+{{ order.notes }}
+
+Payment Method: {{ order.get_payment_method_display }}
+
+Please prepare and dispatch the order as soon as possible.

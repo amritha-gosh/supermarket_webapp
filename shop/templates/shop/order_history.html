@@ -1,0 +1,44 @@
+{% extends 'shop/base.html' %}
+{% block title %}My Orders{% endblock %}
+
+{% block content %}
+  <h2 class="mb-4">My Orders</h2>
+  {% if orders %}
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Order #</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Items</th>
+          <th>Total (£)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td><a href="{% url 'order_detail' order.id %}">#{{ order.id }}</a></td>
+          <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+          <td>
+            {% if order.paid %}
+              <span class="badge bg-success">Paid</span>
+            {% else %}
+              <span class="badge bg-warning">Pending</span>
+            {% endif %}
+          </td>
+          <td>
+            <ul>
+            {% for item in order.items.all %}
+              <li>{{ item.product.name }} x{{ item.quantity }}</li>
+            {% endfor %}
+            </ul>
+          </td>
+          <td>{{ order.total_amount|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>You have no orders yet.</p>
+  {% endif %}
+{% endblock %}

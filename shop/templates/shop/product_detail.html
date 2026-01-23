@@ -1,0 +1,156 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} | Spicexpress{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+  <div class="row g-4 align-items-start">
+    <!-- Product Image -->
+    <div class="col-md-5">
+      <div class="detail-img-box position-relative">
+        {% if product.image %}
+          <img src="{{ product.image.url }}" class="img-fluid rounded shadow-sm w-100" alt="{{ product.name }}">
+          <!-- Veg icon in corner if needed -->
+          <img src="{% static 'veg.png' %}" class="veg-icon-detail" alt="Veg" title="Vegetarian">
+        {% endif %}
+      </div>
+    </div>
+    <!-- Product Info -->
+    <div class="col-md-7">
+      <h2 class="mb-1" style="font-family:'Montserrat',sans-serif;font-weight:700;">{{ product.name }}</h2>
+      <div class="mb-2 stock-status">
+        <span class="in-stock"><i class="fa fa-check-circle"></i> In Stock</span>
+      </div>
+      <div class="mb-3" style="font-size:2rem; color:var(--deep-red);font-weight:700;">
+        £{{ product.price }}
+      </div>
+      <p style="font-size:1.11rem;">{{ product.description }}</p>
+<form method="post" action="{% url 'add_to_cart' product.id %}" class="d-flex flex-column flex-sm-row align-items-start gap-2 mb-2" style="max-width:320px;">
+    {% csrf_token %}
+    <div class="input-group" style="width:130px;">
+        <button type="button" class="btn btn-outline-secondary" onclick="decrementQty()">-</button>
+        <input type="text" id="qtyInput" name="quantity" value="1" class="form-control text-center" style="max-width:42px;" readonly>
+        <button type="button" class="btn btn-outline-secondary" onclick="incrementQty()">+</button>
+    </div>
+    <button class="add-cart-btn ms-sm-2 mt-2 mt-sm-0" type="submit"><i class="fa fa-shopping-cart"></i> Add to Cart</button>
+</form>
+
+{% if user.is_authenticated %}
+<form method="post" action="{% url 'add_to_wishlist' product.id %}" class="mt-1">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-link p-0" style="text-decoration:none;color:#20336b;font-weight:500;">
+        <i class="fa fa-heart"></i> Add Wishlist
+    </button>
+</form>
+{% else %}
+<p class="mt-2"><a href="{% url 'account_login' %}"><i class="fa fa-heart"></i> Login to add to wishlist</a></p>
+{% endif %}
+
+      <hr>
+      <!-- Reviews -->
+      <h5 class="mt-4 mb-2" style="font-family:'Montserrat',sans-serif;">Reviews</h5>
+      <div class="review-list mb-3">
+        {% for review in product.reviews.all %}
+          <div class="mb-2 p-2 rounded border bg-light">
+            <strong>{{ review.user.username }}</strong>
+            <span class="text-warning">
+              {% for i in "12345"|slice:":review.rating"|make_list %}
+                <i class="fa fa-star"></i>
+              {% endfor %}
+            </span>
+            <span class="text-muted small ms-2">{{ review.created_at|date:"M d, Y" }}</span>
+            <div>{{ review.comment }}</div>
+          </div>
+        {% empty %}
+          <p>No reviews yet.</p>
+        {% endfor %}
+      </div>
+      {% if user.is_authenticated %}
+        <form action="{% url 'add_review' product.id %}" method="post" class="mt-2">
+          {% csrf_token %}
+          <div class="mb-2">
+            <label for="rating" class="form-label">Rating:</label>
+            <select name="rating" id="rating" class="form-select w-auto d-inline-block">
+              {% for i in "54321" %}
+                <option value="{{ i }}">{{ i }} Stars</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-2">
+            <textarea name="comment" class="form-control" rows="2" placeholder="Write your review..."></textarea>
+          </div>
+          <button class="btn btn-outline-primary" type="submit">Submit Review</button>
+        </form>
+      {% else %}
+        <p><a href="{% url 'account_login' %}">Login to write a review</a></p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Style: place inside your style block or main CSS file -->
+<style>
+.detail-img-box {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 14px #eaeaeaaf;
+  margin-bottom: 1rem;
+  min-height: 310px;
+  position: relative;
+}
+.veg-icon-detail {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 28px;
+  height: 28px;
+  background: #fff;
+  border-radius: 6px;
+  border: 1.5px solid #39a845;
+  padding: 2px;
+  z-index: 2;
+}
+.add-cart-btn {
+  background: #20336b;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.05rem;
+  border: none;
+  border-radius: 20px;
+  padding: 9px 28px;
+  margin-top: 0.1rem;
+  transition: background 0.13s;
+}
+.add-cart-btn:hover {
+  background: #f77d1b;
+  color: #fff;
+}
+.stock-status .in-stock {
+  color: #36c46b;
+  font-weight: 500;
+  font-size: 1.08rem;
+}
+.review-list .fa-star {
+  color: #f7c84b;
+}
+@media (max-width: 900px) {
+  .detail-img-box { min-height: 210px;}
+}
+</style>
+
+<script>
+function incrementQty() {
+    var qty = document.getElementById('qtyInput');
+    var val = parseInt(qty.value) || 1;
+    qty.value = (val < 99) ? val + 1 : 99;
+}
+function decrementQty() {
+    var qty = document.getElementById('qtyInput');
+    var val = parseInt(qty.value) || 1;
+    qty.value = (val > 1) ? val - 1 : 1;
+}
+</script>
+
+{% endblock %}

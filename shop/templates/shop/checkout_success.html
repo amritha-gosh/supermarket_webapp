@@ -1,0 +1,10 @@
+{% extends 'shop/base.html' %}
+{% block title %}Order Success{% endblock %}
+
+{% block content %}
+  <div class="text-center my-5">
+    <h2 class="mb-3 text-success"><i class="fa fa-check-circle"></i> Thank you for your order!</h2>
+    <p>Your payment was successful. You will receive an email confirmation shortly.</p>
+    <a href="{% url 'home' %}" class="btn btn-primary mt-3">Back to Home</a>
+  </div>
+{% endblock %}

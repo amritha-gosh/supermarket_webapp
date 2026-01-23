@@ -1,0 +1,269 @@
+{% extends 'shop/base.html' %}
+{% block title %}Checkout | Spicexpress{% endblock %}
+{% block content %}
+
+<style>
+  .checkout-section {
+    background: #fffaf6;
+    border-radius: 16px;
+    box-shadow: 0 2px 24px #e6e0d680;
+    padding: 40px 28px;
+    margin-bottom: 32px;
+  }
+  .checkout-label { font-weight: 600; color: #1a1a1a; }
+  .checkout-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 2.2rem;
+    color: #111;
+    margin-bottom: 28px;
+  }
+  .form-control:focus {
+    border-color: #f77d1b;
+    box-shadow: 0 0 0 0.2rem #f8debc50;
+  }
+  .order-summary-box {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 14px #ece9e3a0;
+    padding: 28px 24px;
+  }
+  .cart-product-img {
+    width: 50px;
+    border-radius: 8px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .form-required { color: #d11304; font-weight: 700; margin-left: 3px; }
+  .form-text-danger, .text-danger { color: #d11304 !important; }
+  .form-text-success { color: #21b344 !important; }
+  .checkout-btn {
+    background: var(--red);
+    border-color: var(--red);
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+  .checkout-btn:disabled {
+    opacity: 0.6 !important;
+    pointer-events: none;
+    background: #bbb !important;
+    border-color: #bbb !important;
+  }
+  .alert-required {
+    background: #fff6e7;
+    border: 1px solid #f9dcb7;
+    color: #d11304;
+    border-radius: 7px;
+    padding: 8px 16px;
+    margin-bottom: 14px;
+  }
+  .payment-methods label {
+    margin-right: 30px;
+    font-weight: 600;
+  }
+  .payment-methods input[type=radio] { margin-right: 8px; }
+</style>
+
+<div class="container py-5">
+  <div class="row">
+    <!-- Billing Details -->
+    <div class="col-lg-7">
+      <div class="checkout-section">
+        <div class="checkout-title">Billing details</div>
+        <form method="POST" id="checkout-form" autocomplete="off" novalidate>
+          {% csrf_token %}
+
+          {% if form.errors %}
+            <div class="alert alert-danger">
+              <b>Form errors:</b>
+              <ul>
+                {% for field, error_list in form.errors.items %}
+                  <li><b>{{ field }}:</b> {{ error_list|striptags }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          {% if form.non_field_errors %}
+            <div class="alert-required">
+              {% for error in form.non_field_errors %}
+                {{ error }}<br>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Form Fields -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="checkout-label">First name <span class="form-required">*</span></label>
+              {{ form.first_name }}
+              {{ form.first_name.errors|first }}
+            </div>
+            <div class="col-md-6">
+              <label class="checkout-label">Last name <span class="form-required">*</span></label>
+              {{ form.last_name }}
+              {{ form.last_name.errors|first }}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="checkout-label">Street address <span class="form-required">*</span></label>
+            {{ form.address }}
+            {{ form.address.errors|first }}
+          </div>
+
+          <div class="mb-3">
+            <label class="checkout-label">Apartment, suite, unit, etc. (optional)</label>
+            {{ form.address2 }}
+          </div>
+
+          <div class="mb-3">
+            <label class="checkout-label">Town / City <span class="form-required">*</span></label>
+            {{ form.city }}
+            {{ form.city.errors|first }}
+          </div>
+
+          <div class="mb-3">
+            <label class="checkout-label">Postcode <span class="form-required">*</span></label>
+            {{ form.postcode }}
+            <div id="postcode-feedback" class="form-text"></div>
+            {{ form.postcode.errors|first }}
+          </div>
+
+          <div class="mb-3">
+            <label class="checkout-label">Phone <span class="form-required">*</span></label>
+            {{ form.phone }}
+            {{ form.phone.errors|first }}
+          </div>
+
+          <div class="mb-3">
+            <label class="checkout-label">Email address <span class="form-required">*</span></label>
+            {{ form.email }}
+            {{ form.email.errors|first }}
+          </div>
+
+          <div class="mb-3">
+            <label class="checkout-label">Order notes (optional)</label>
+            {{ form.notes }}
+          </div>
+
+          <div class="mb-4">
+            <label class="checkout-label">Payment method <span class="form-required">*</span></label>
+            <div class="payment-methods">
+              {% for radio in form.payment_method %}
+                <label>{{ radio.tag }} {{ radio.choice_label }}</label>
+              {% endfor %}
+            </div>
+            {{ form.payment_method.errors|first }}
+          </div>
+
+          <input type="hidden" name="store_key" id="store_key" value="{{ store_key|default_if_none:'' }}">
+          <button type="submit" class="btn checkout-btn btn-lg w-100 mt-2" id="checkout-btn" disabled>Place Order</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="col-lg-5 mt-5 mt-lg-0">
+      <div class="order-summary-box">
+        <h4 class="mb-4">Your order</h4>
+        <table>
+          <thead>
+            <tr><th>Product</th><th class="text-end">Subtotal</th></tr>
+          </thead>
+          <tbody>
+            {% for item in cart_items %}
+              <tr>
+                <td>
+                  <img src="{{ item.product.image.url }}" class="cart-product-img" alt="{{ item.product.name }}">
+                  {{ item.product.name }}
+                  {% if item.quantity > 1 %}
+                    <span class="text-muted">× {{ item.quantity }}</span>
+                  {% endif %}
+                </td>
+                <td class="text-end">£{{ item.subtotal|floatformat:2 }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td class="fw-bold">Subtotal</td>
+              <td class="text-end">£{{ total|floatformat:2 }}</td>
+            </tr>
+            <tr>
+              <td class="fw-bold">Total</td>
+              <td class="text-end"><b style="font-size:1.15em;">£{{ total|floatformat:2 }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const postcodeInput = document.getElementById('id_postcode');
+const feedback = document.getElementById('postcode-feedback');
+const btn = document.getElementById('checkout-btn');
+const storeKeyInput = document.getElementById('store_key');
+let validPostcode = false;
+
+function checkPostcode() {
+  const postcode = postcodeInput.value.trim();
+  if (postcode.length < 5) {
+    feedback.textContent = '';
+    feedback.className = "form-text";
+    btn.disabled = true;
+    validPostcode = false;
+    storeKeyInput.value = "";
+    return;
+  }
+
+  feedback.textContent = 'Checking delivery area...';
+  feedback.className = "form-text text-secondary";
+
+  fetch("{% url 'postcode_check' %}?postcode=" + encodeURIComponent(postcode))
+    .then(resp => resp.json())
+    .then(data => {
+      if (data.deliverable) {
+        feedback.textContent = "We deliver to your area (" + data.store_name + ").";
+        feedback.className = "form-text form-text-success";
+        btn.disabled = false;
+        validPostcode = true;
+        storeKeyInput.value = data.store_key || "";
+      } else {
+        feedback.textContent = "Sorry, we do not deliver to your location.";
+        feedback.className = "form-text text-danger";
+        btn.disabled = true;
+        validPostcode = false;
+        storeKeyInput.value = "";
+      }
+    })
+    .catch(() => {
+      feedback.textContent = "Unable to validate postcode.";
+      feedback.className = "form-text text-danger";
+      btn.disabled = true;
+      validPostcode = false;
+      storeKeyInput.value = "";
+    });
+}
+
+postcodeInput.addEventListener('input', checkPostcode);
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (postcodeInput.value.trim().length >= 5) {
+    checkPostcode();
+  }
+
+  document.getElementById('checkout-form').addEventListener('submit', function (e) {
+    if (!validPostcode) {
+      e.preventDefault();
+      feedback.textContent = "Please enter a valid postcode in our delivery area.";
+      feedback.className = "form-text text-danger";
+      btn.disabled = true;
+    }
+  });
+});
+</script>
+
+{% endblock %}

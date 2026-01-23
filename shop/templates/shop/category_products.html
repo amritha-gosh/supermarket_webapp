@@ -1,0 +1,67 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} | Spicexpress{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+    <h2 class="mb-4" style="font-family:'Montserrat',sans-serif;font-weight:700;">
+        {{ category.name }}
+    </h2>
+    <div class="row row-cols-2 row-cols-md-4 g-4">
+        {% for product in products %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="position-relative" style="background:#fff;border-radius:18px 18px 0 0;min-height:150px;">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" class="img-fluid d-block mx-auto p-3" style="height:140px;object-fit:contain;" alt="{{ product.name }}">
+                    {% else %}
+                        <img src="{% static 'no_image.png' %}" class="img-fluid d-block mx-auto p-3" style="height:140px;object-fit:contain;" alt="No image">
+                    {% endif %}
+                    <!-- Veg Icon Example -->
+                    <img src="{% static 'veg.png' %}" class="veg-icon" alt="Veg" title="Vegetarian" style="position:absolute;top:13px;right:13px;width:24px;height:24px;border-radius:5px;border:1.5px solid #38c671;background:#fff;">
+                </div>
+                <div class="card-body text-center pb-3">
+                    <div class="product-title mb-1" style="font-weight:700;color:#ce2829;">{{ product.name }}</div>
+                    <div class="mb-1" style="font-size:1.05rem; font-weight:600;">
+                        £{{ product.price }}
+                    </div>
+                    <div class="mb-2" style="color:#36c46b;font-weight:500;font-size:0.99rem;">
+                        <i class="fa fa-check-circle"></i> In Stock
+                    </div>
+                    <form method="post" action="{% url 'add_to_cart' product.id %}">
+                        {% csrf_token %}
+                        <button class="btn btn-dark w-100" type="submit" style="border-radius:18px;">
+                            <i class="fa fa-shopping-cart"></i> Add to cart
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col">
+            <div class="alert alert-info">No products in this category yet.</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .veg-icon {
+        box-shadow: 0 1px 4px #e2e2e2b0;
+    }
+    .product-title {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.06rem;
+        letter-spacing: 0.01em;
+    }
+    .card {
+        border-radius: 18px;
+        transition: box-shadow 0.13s, transform 0.13s;
+    }
+    .card:hover {
+        box-shadow: 0 8px 26px #f77d1b1a;
+        transform: translateY(-2px) scale(1.018);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,5 @@
+/* Fix for select box options visibility in Django admin (Jazzmin dark theme) */
+select, select option {
+    background: #23272b !important;  /* Or your admin background */
+    color: #fff !important;          /* White text for dark background */
+}
