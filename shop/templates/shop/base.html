@@ -6,7 +6,6 @@
   <title>{% block title %}Spicexpress{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Use a crisp favicon (optional) -->
   <link rel="icon" type="image/png" href="{% static 'spicexpress_logo.png' %}">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -314,7 +313,7 @@
     }
     .sidebar-categories a:hover{ color:var(--brand-strong); }
 
-    /* ===== Promo banner (FIXED: no blank space) ===== */
+    /* ===== Promo banner (no blank space) ===== */
     :root{
       --banner-h: 320px;
       --banner-h-md: 240px;
@@ -421,20 +420,22 @@
       .footer-grid{ grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 560px){
-      /* FIX: sticky header hides page content on mobile */
+      /* Mobile: no sticky header */
       header{
-        position: relative;     /* no sticky on mobile */
+        position: relative;
         top: auto;
       }
       .brand-logo{ height:48px; }
-      .search-select{ display:none; } /* cleaner mobile search */
+      .search-select{ display:none; }
       .footer-grid{ grid-template-columns: 1fr; }
       .nav-row{ gap:10px; }
       .store-select{ min-width: 150px; }
+      /* mobile: main should not be padded */
+      main{ padding-top: 0 !important; }
     }
 
-    /* Safety: page content spacing */
-    main{ padding-top: 8px; }
+    /* Default: JS will set main padding when sticky header is active */
+    main{ padding-top: 0; }
   </style>
 
   {% block extra_head %}{% endblock %}
@@ -467,7 +468,7 @@
   </div>
 
   <!-- ===== Header ===== -->
-  <header>
+  <header id="siteHeader">
     <div class="container">
       <div class="header-row">
         <a class="brand-wrap tap" href="{% url 'home' %}" style="text-decoration:none;">
@@ -490,7 +491,6 @@
         </div>
 
         <div class="header-actions">
-          <!-- Account dropdown -->
           <div class="dropdown">
             <a class="icon-pill tap dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="fa fa-user"></i>
@@ -512,7 +512,6 @@
             </ul>
           </div>
 
-          <!-- Cart -->
           <a href="#" class="icon-pill tap position-relative" onclick="openCartDrawer();return false;">
             <i class="fa fa-shopping-cart"></i>
             <span class="d-none d-sm-inline">£{{ cart_total|default:'0.00' }}</span>
@@ -523,7 +522,6 @@
         </div>
       </div>
 
-      <!-- Nav -->
       <div class="nav-row">
         <div class="nav-left">
           <button class="btn-brand tap" type="button"
@@ -538,7 +536,6 @@
           <a href="{% url 'order_history' %}" class="nav-linkx {% if request.resolver_match.url_name == 'order_history' %}active{% endif %}">My Orders</a>
         </div>
 
-        <!-- Store selector (same position, aligned properly) -->
         <div class="nav-right">
           {% if all_stores %}
             <form method="post" action="{% url 'change_store_in_nav' %}" class="store-form">
@@ -570,9 +567,7 @@
       <span>Your Cart</span>
       <button class="btn btn-sm btn-danger float-end tap" onclick="closeCartDrawer()">&times;</button>
     </div>
-    <div class="cart-drawer-items" id="cartDrawerItems">
-      <!-- AJAX content -->
-    </div>
+    <div class="cart-drawer-items" id="cartDrawerItems"></div>
     <div class="cart-drawer-footer">
       <a href="{% url 'cart' %}" class="btn btn-success w-100 tap">Go to Cart & Checkout</a>
     </div>
@@ -640,18 +635,19 @@
         {% endif %}
       </div>
     {% else %}
-      <img src="{% static 'demo/banners/banner1.jpg' %}" class="promo-banner-img" alt="Promo Banner">
+      <!-- FIXED: your repo has banner1.png -->
+      <img src="{% static 'demo/banners/banner1.png' %}" class="promo-banner-img" alt="Promo Banner">
     {% endif %}
   </div>
 
   <!-- ===== Main ===== -->
-  <main>
+  <main id="pageMain">
     <div class="container py-3">
       {% block content %}{% endblock %}
     </div>
   </main>
 
-  <!-- ===== Footer (upgraded) ===== -->
+  <!-- ===== Footer ===== -->
   <footer>
     <div class="container">
       <div class="footer-grid reveal">
@@ -721,6 +717,24 @@
       els.forEach(el => revealObserver.observe(el));
     }
     document.addEventListener('DOMContentLoaded', hookReveal);
+
+    // ===== FIX: sticky header shouldn't cover content (desktop/tablet only) =====
+    function syncMainOffset(){
+      const header = document.getElementById('siteHeader');
+      const main = document.getElementById('pageMain');
+      if (!header || !main) return;
+
+      const isMobile = window.matchMedia('(max-width: 560px)').matches;
+      if (isMobile){
+        main.style.paddingTop = '0px';
+        return;
+      }
+      // header is sticky on desktop/tablet: add safe padding
+      const h = header.offsetHeight || 0;
+      main.style.paddingTop = (h ? (h + 8) : 0) + 'px';
+    }
+    window.addEventListener('load', syncMainOffset);
+    window.addEventListener('resize', syncMainOffset);
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
