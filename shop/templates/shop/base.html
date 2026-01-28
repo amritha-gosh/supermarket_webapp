@@ -6,6 +6,7 @@
   <title>{% block title %}Spicexpress{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <!-- favicon -->
   <link rel="icon" type="image/png" href="{% static 'spicexpress_logo.png' %}">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -14,436 +15,218 @@
 
   <style>
     :root{
-      --brand: #f77d1b;
+      --brand:#f77d1b;
       --brand-strong:#d11304;
       --bg:#fffaf6;
       --text:#111;
       --muted:#6b7280;
-      --card:#ffffff;
+      --card:#fff;
       --radius:18px;
-      --shadow: 0 14px 36px rgba(17,17,17,0.08);
-      --shadow-soft: 0 10px 26px rgba(17,17,17,0.06);
-      --stroke: rgba(0,0,0,0.06);
+      --shadow:0 14px 36px rgba(17,17,17,0.08);
+      --shadow-soft:0 10px 26px rgba(17,17,17,0.06);
+      --stroke:rgba(0,0,0,0.06);
+
+      --banner-h:320px;
+      --banner-h-md:240px;
+      --banner-h-sm:180px;
     }
 
     html,body{ background:var(--bg); color:var(--text); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
 
-    /* ===== Global micro-interactions ===== */
-    .tap{ transition: transform 140ms ease, box-shadow 140ms ease; }
-    .tap:active{ transform: scale(0.98); }
-    .hover-lift{ transition: transform 220ms ease, box-shadow 220ms ease; }
-    .hover-lift:hover{ transform: translateY(-3px); box-shadow: var(--shadow); }
+    /* micro interactions */
+    .tap{ transition:transform 140ms ease, box-shadow 140ms ease; }
+    .tap:active{ transform:scale(0.98); }
+    .hover-lift{ transition:transform 220ms ease, box-shadow 220ms ease; }
+    .hover-lift:hover{ transform:translateY(-3px); box-shadow:var(--shadow); }
 
-    /* ===== Scroll reveal ===== */
-    .reveal{
-      opacity:0;
-      transform: translateY(14px);
-      transition: opacity 520ms ease, transform 520ms ease;
-      will-change: opacity, transform;
-    }
-    .reveal.in-view{
-      opacity:1;
-      transform: translateY(0);
-    }
+    /* reveal */
+    .reveal{ opacity:0; transform:translateY(14px); transition:opacity 520ms ease, transform 520ms ease; will-change:opacity,transform; }
+    .reveal.in-view{ opacity:1; transform:translateY(0); }
 
-    /* ===== Top bar ===== */
-    .top-bar{
-      background:#121212;
-      color:#fff;
-      font-size:0.98rem;
-      padding:7px 0;
-      letter-spacing:0.01em;
-    }
-    .top-bar .container{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-    }
+    /* top bar */
+    .top-bar{ background:#121212; color:#fff; font-size:0.98rem; padding:7px 0; letter-spacing:0.01em; }
+    .top-bar .container{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
     .top-bar .pill-top{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:6px 10px;
-      border-radius:999px;
-      background:rgba(255,255,255,0.08);
-      border:1px solid rgba(255,255,255,0.12);
-      font-weight:800;
+      display:inline-flex; align-items:center; gap:10px; padding:6px 10px;
+      border-radius:999px; background:rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.12); font-weight:800;
     }
     .top-bar a{ color:#fff; text-decoration:none; font-weight:800; }
     .top-bar a:hover{ text-decoration:underline; }
 
-    /* ===== Sticky header (modern) ===== */
+    /* sticky header desktop only */
     header{
       position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: rgba(255,255,255,0.86);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-      box-shadow: 0 8px 22px rgba(17,17,17,0.06);
+      top:0;
+      z-index:1000;
+      background:rgba(255,255,255,0.86);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(0,0,0,0.06);
+      box-shadow:0 8px 22px rgba(17,17,17,0.06);
     }
 
-    .header-row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      padding: 12px 14px;
-    }
+    .header-row{ display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 14px; }
 
-    /* Logo */
-    .brand-wrap{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width: 220px;
-    }
+    /* logo */
+    .brand-wrap{ display:flex; align-items:center; gap:12px; min-width:220px; }
     .brand-logo{
-      height:64px;
-      width:auto;
-      max-width: 260px;
-      object-fit:contain;
-      display:block;
-      filter: drop-shadow(0 6px 16px rgba(17,17,17,0.10));
-      transition: transform 220ms ease;
+      height:64px; width:auto; max-width:260px; object-fit:contain; display:block;
+      filter:drop-shadow(0 6px 16px rgba(17,17,17,0.10));
+      transition:transform 220ms ease;
     }
-    .brand-wrap:hover .brand-logo{ transform: translateY(-1px); }
+    .brand-wrap:hover .brand-logo{ transform:translateY(-1px); }
 
-    /* Search */
-    .header-search{
-      flex: 1 1 520px;
-      display:flex;
-      justify-content:center;
-    }
+    /* search */
+    .header-search{ flex:1 1 520px; display:flex; justify-content:center; }
     .search-form{
-      width:100%;
-      max-width: 720px;
-      display:flex;
-      align-items:center;
-      overflow:hidden;
-      border-radius:999px;
-      background:#fff;
+      width:100%; max-width:720px; display:flex; align-items:center; overflow:hidden;
+      border-radius:999px; background:#fff;
       border:2px solid rgba(247,125,27,0.55);
-      box-shadow: 0 10px 26px rgba(247,125,27,0.10);
+      box-shadow:0 10px 26px rgba(247,125,27,0.10);
     }
-    .search-select{
-      border:none;
-      outline:none;
-      padding: 12px 14px;
-      font-weight:800;
-      color:var(--text);
-      background: #fff;
-      max-width: 190px;
-    }
-    .search-input{
-      border:none;
-      outline:none;
-      flex:1;
-      padding: 12px 14px;
-      font-weight:700;
-    }
+    .search-select{ border:none; outline:none; padding:12px 14px; font-weight:800; background:#fff; max-width:190px; }
+    .search-input{ border:none; outline:none; flex:1; padding:12px 14px; font-weight:700; }
     .search-btn{
-      border:none;
-      outline:none;
-      background: linear-gradient(135deg, var(--brand), var(--brand-strong));
-      color:#fff;
-      padding: 12px 18px;
-      font-weight:900;
-      display:flex;
-      align-items:center;
-      gap:8px;
+      border:none; outline:none;
+      background:linear-gradient(135deg,var(--brand),var(--brand-strong));
+      color:#fff; padding:12px 18px; font-weight:900;
+      display:flex; align-items:center; gap:8px;
     }
-    .search-btn:hover{ filter: brightness(1.02); }
+    .search-btn:hover{ filter:brightness(1.02); }
 
-    /* Header actions */
-    .header-actions{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-width: 220px;
-      justify-content:flex-end;
-    }
-
+    /* actions */
+    .header-actions{ display:flex; align-items:center; gap:10px; min-width:220px; justify-content:flex-end; }
     .icon-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding: 10px 12px;
-      border-radius:999px;
-      background:#fff;
+      display:inline-flex; align-items:center; gap:10px; padding:10px 12px;
+      border-radius:999px; background:#fff;
       border:1px solid rgba(0,0,0,0.07);
-      box-shadow: var(--shadow-soft);
-      text-decoration:none;
-      color:var(--text);
-      font-weight:900;
+      box-shadow:var(--shadow-soft);
+      text-decoration:none; color:var(--text); font-weight:900;
     }
-    .icon-pill i{ color: var(--brand-strong); }
+    .icon-pill i{ color:var(--brand-strong); }
 
     .cart-badge{
-      position:absolute;
-      top:-7px;
-      right:-10px;
-      background:#e31b23;
-      color:#fff;
-      font-size:0.82rem;
-      min-width:20px;
-      height:20px;
-      border-radius:999px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:900;
-      box-shadow: 0 6px 14px rgba(227,27,35,0.25);
+      position:absolute; top:-7px; right:-10px;
+      background:#e31b23; color:#fff; font-size:0.82rem;
+      min-width:20px; height:20px; border-radius:999px;
+      display:flex; align-items:center; justify-content:center; font-weight:900;
+      box-shadow:0 6px 14px rgba(227,27,35,0.25);
     }
 
-    /* ===== Nav row ===== */
+    /* nav row */
     .nav-row{
-      padding: 10px 14px 12px 14px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      border-top: 1px solid rgba(0,0,0,0.05);
+      padding:10px 14px 12px 14px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; border-top:1px solid rgba(0,0,0,0.05);
     }
-
-    .nav-left{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .nav-right{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
+    .nav-left{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .nav-right{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
 
     .nav-linkx{
-      text-decoration:none;
-      color:var(--text);
-      font-weight:900;
-      padding: 8px 10px;
-      border-radius:999px;
-      transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+      text-decoration:none; color:var(--text);
+      font-weight:900; padding:8px 10px; border-radius:999px;
+      transition:background 160ms ease, color 160ms ease, transform 160ms ease;
     }
-    .nav-linkx:hover{
-      background: rgba(247,125,27,0.10);
-      color: var(--brand-strong);
-      transform: translateY(-1px);
-    }
-    .nav-linkx.active{
-      background: rgba(247,125,27,0.16);
-      color: var(--brand-strong);
-    }
+    .nav-linkx:hover{ background:rgba(247,125,27,0.10); color:var(--brand-strong); transform:translateY(-1px); }
+    .nav-linkx.active{ background:rgba(247,125,27,0.16); color:var(--brand-strong); }
 
     .btn-brand{
-      background: linear-gradient(135deg, var(--brand), var(--brand-strong));
-      color:#fff;
-      font-weight:900;
-      border:none;
-      padding: 10px 14px;
-      border-radius: 999px;
-      box-shadow: 0 12px 26px rgba(247,125,27,0.20);
-      text-decoration:none;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
+      background:linear-gradient(135deg,var(--brand),var(--brand-strong));
+      color:#fff; font-weight:900; border:none;
+      padding:10px 14px; border-radius:999px;
+      box-shadow:0 12px 26px rgba(247,125,27,0.20);
+      text-decoration:none; display:inline-flex; align-items:center; gap:8px;
     }
-    .btn-brand:hover{ filter: brightness(1.02); color:#fff; }
+    .btn-brand:hover{ filter:brightness(1.02); color:#fff; }
 
-    /* ===== Store selector alignment (nav-right) ===== */
-    .store-form{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-    .store-label{
-      font-weight:900;
-      opacity:.75;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      white-space:nowrap;
-    }
-    .store-select{
-      min-width: 170px;
-      max-width: 240px;
-      border-radius: 12px;
-      font-weight:800;
-    }
-    .store-btn{
-      border-radius: 999px;
-      font-weight:900;
-      padding: 7px 12px;
-      white-space:nowrap;
-    }
+    /* store form alignment */
+    .store-form{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .store-label{ font-weight:900; opacity:.75; display:inline-flex; align-items:center; gap:8px; white-space:nowrap; }
+    .store-select{ min-width:170px; max-width:240px; border-radius:12px; font-weight:800; }
+    .store-btn{ border-radius:999px; font-weight:900; padding:7px 12px; white-space:nowrap; }
 
-    /* ===== Category sidebar ===== */
+    /* category sidebar */
     #categorySidebar{
       position:fixed; top:0; left:-340px;
       width:340px; max-width:90vw; height:100vh;
       background:#fff; z-index:9999;
-      box-shadow: 10px 0 40px rgba(17,17,17,0.12);
-      transition: left 260ms ease;
+      box-shadow:10px 0 40px rgba(17,17,17,0.12);
+      transition:left 260ms ease;
       overflow-y:auto;
     }
     #categorySidebar.open{ left:0; }
     .sidebar-header{
       display:flex; align-items:center; justify-content:space-between;
-      padding: 16px 16px;
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-      font-weight:1000;
-      font-size: 1.1rem;
+      padding:16px 16px;
+      border-bottom:1px solid rgba(0,0,0,0.06);
+      font-weight:1000; font-size:1.1rem;
     }
-    .sidebar-categories{ padding: 10px 16px 20px 16px; }
+    .sidebar-categories{ padding:10px 16px 20px 16px; }
     .sidebar-categories a{
-      display:block;
-      padding: 11px 0;
-      text-decoration:none;
-      color:var(--text);
-      font-weight:900;
-      border-bottom: 1px solid rgba(0,0,0,0.04);
+      display:block; padding:11px 0;
+      text-decoration:none; color:var(--text);
+      font-weight:900; border-bottom:1px solid rgba(0,0,0,0.04);
     }
     .sidebar-categories a:hover{ color:var(--brand-strong); }
 
-    /* ===== Promo banner (no blank space) ===== */
-    :root{
-      --banner-h: 320px;
-      --banner-h-md: 240px;
-      --banner-h-sm: 180px;
-    }
-    .promo-banner{
-      width:100%;
-      height: var(--banner-h);
-      background: var(--bg);
-      position:relative;
-      overflow:hidden;
-      margin:0;
-      padding:0;
-    }
-    #promoCarousel, .carousel-inner, .carousel-item{
-      height:100%;
-    }
-    .carousel-item{ position:relative; }
-    .promo-banner-img{
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      object-position:center;
-      display:block;
-      filter: brightness(0.98);
-    }
-    @media (max-width: 900px){
-      .promo-banner{ height: var(--banner-h-md); }
-    }
-    @media (max-width: 560px){
-      .promo-banner{ height: var(--banner-h-sm); }
-    }
+    /* banner (no blank space) */
+    .promo-banner{ width:100%; height:var(--banner-h); background:var(--bg); position:relative; overflow:hidden; margin:0; padding:0; }
+    #promoCarousel, .carousel-inner, .carousel-item{ height:100%; }
+    .promo-banner-img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; filter:brightness(0.98); }
+    @media (max-width:900px){ .promo-banner{ height:var(--banner-h-md); } }
+    @media (max-width:560px){ .promo-banner{ height:var(--banner-h-sm); } }
 
-    /* ===== Cart drawer ===== */
-    .cart-drawer{
-      position:fixed; right:-420px; top:0;
-      width:420px; max-width:95vw; height:100vh;
-      background:#fff;
-      box-shadow: -10px 0 40px rgba(17,17,17,0.18);
-      z-index: 10000;
-      transition: right 280ms ease;
-    }
+    /* cart drawer */
+    .cart-drawer{ position:fixed; right:-420px; top:0; width:420px; max-width:95vw; height:100vh; background:#fff;
+      box-shadow:-10px 0 40px rgba(17,17,17,0.18); z-index:10000; transition:right 280ms ease; }
     .cart-drawer.open{ right:0; }
-    .cart-drawer-header{
-      font-weight:1000; font-size:1.2rem;
-      padding: 16px 18px;
-      border-bottom:1px solid rgba(0,0,0,0.06);
-    }
-    .cart-drawer-items{ max-height: 62vh; overflow:auto; padding: 16px 18px; }
-    .cart-drawer-footer{ border-top:1px solid rgba(0,0,0,0.06); padding: 16px 18px; }
+    .cart-drawer-header{ font-weight:1000; font-size:1.2rem; padding:16px 18px; border-bottom:1px solid rgba(0,0,0,0.06); }
+    .cart-drawer-items{ max-height:62vh; overflow:auto; padding:16px 18px; }
+    .cart-drawer-footer{ border-top:1px solid rgba(0,0,0,0.06); padding:16px 18px; }
 
-    /* ===== Footer ===== */
-    footer{
-      background: linear-gradient(135deg, var(--brand), var(--brand-strong));
-      color:#fff;
-      margin-top: 30px;
-    }
-    .footer-grid{
-      display:grid;
-      grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
-      gap: 18px;
-      padding: 30px 0 18px 0;
-    }
-    .footer-title{
-      font-weight:1000;
-      margin-bottom: 10px;
-      font-size: 1.05rem;
-    }
-    .footer-link{
-      color:#fff;
-      text-decoration:none;
-      display:block;
-      padding: 4px 0;
-      font-weight:800;
-      opacity: 0.95;
-    }
-    .footer-link:hover{ text-decoration: underline; opacity: 1; }
+    /* footer */
+    footer{ background:linear-gradient(135deg,var(--brand),var(--brand-strong)); color:#fff; margin-top:30px; }
+    .footer-grid{ display:grid; grid-template-columns:1.2fr 1fr 1fr 1.2fr; gap:18px; padding:30px 0 18px 0; }
+    .footer-title{ font-weight:1000; margin-bottom:10px; font-size:1.05rem; }
+    .footer-link{ color:#fff; text-decoration:none; display:block; padding:4px 0; font-weight:800; opacity:.95; }
+    .footer-link:hover{ text-decoration:underline; opacity:1; }
     .footer-bottom{
-      border-top: 1px solid rgba(255,255,255,0.22);
-      padding: 14px 0;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      gap:10px;
-      font-weight:800;
+      border-top:1px solid rgba(255,255,255,0.22);
+      padding:14px 0;
+      display:flex; align-items:center; justify-content:space-between;
+      flex-wrap:wrap; gap:10px; font-weight:800;
     }
-    .social a{
-      color:#fff;
-      text-decoration:none;
-      font-size: 1.15rem;
-      margin-right: 10px;
-      opacity: 0.95;
-    }
-    .social a:hover{ opacity: 1; transform: translateY(-1px); }
+    .social a{ color:#fff; text-decoration:none; font-size:1.15rem; margin-right:10px; opacity:.95; }
+    .social a:hover{ opacity:1; transform:translateY(-1px); }
 
-    /* ===== Responsive ===== */
-    @media (max-width: 992px){
+    /* responsive */
+    @media (max-width:992px){
       .header-row{ flex-wrap:wrap; }
-      .brand-wrap{ min-width: 180px; }
+      .brand-wrap{ min-width:180px; }
       .brand-logo{ height:56px; }
-      .header-search{ order: 3; flex: 1 1 100%; }
-      .header-actions{ order: 2; }
-      .footer-grid{ grid-template-columns: 1fr 1fr; }
+      .header-search{ order:3; flex:1 1 100%; }
+      .header-actions{ order:2; }
+      .footer-grid{ grid-template-columns:1fr 1fr; }
     }
-    @media (max-width: 560px){
-      /* Mobile: no sticky header */
-      header{
-        position: relative;
-        top: auto;
-      }
+    @media (max-width:560px){
+      header{ position:relative; top:auto; } /* no sticky on mobile */
       .brand-logo{ height:48px; }
       .search-select{ display:none; }
-      .footer-grid{ grid-template-columns: 1fr; }
+      .footer-grid{ grid-template-columns:1fr; }
       .nav-row{ gap:10px; }
-      .store-select{ min-width: 150px; }
-      /* mobile: main should not be padded */
-      main{ padding-top: 0 !important; }
+      .store-select{ min-width:150px; }
     }
 
-    /* Default: JS will set main padding when sticky header is active */
+    /* tighten main spacing so banner + content doesn't look far */
     main{ padding-top: 0; }
+    main .container{ padding-top: 12px !important; }
   </style>
 
   {% block extra_head %}{% endblock %}
 </head>
-
 <body>
 
-  <!-- ===== Top bar ===== -->
+  <!-- top bar -->
   <div class="top-bar">
     <div class="container">
       <div class="pill-top">
@@ -467,8 +250,8 @@
     </div>
   </div>
 
-  <!-- ===== Header ===== -->
-  <header id="siteHeader">
+  <!-- header -->
+  <header>
     <div class="container">
       <div class="header-row">
         <a class="brand-wrap tap" href="{% url 'home' %}" style="text-decoration:none;">
@@ -491,12 +274,11 @@
         </div>
 
         <div class="header-actions">
+          <!-- account dropdown -->
           <div class="dropdown">
             <a class="icon-pill tap dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="fa fa-user"></i>
-              <span class="d-none d-sm-inline">
-                {% if user.is_authenticated %}Account{% else %}Sign in{% endif %}
-              </span>
+              <span class="d-none d-sm-inline">{% if user.is_authenticated %}Account{% else %}Sign in{% endif %}</span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
               {% if user.is_authenticated %}
@@ -512,6 +294,7 @@
             </ul>
           </div>
 
+          <!-- cart -->
           <a href="#" class="icon-pill tap position-relative" onclick="openCartDrawer();return false;">
             <i class="fa fa-shopping-cart"></i>
             <span class="d-none d-sm-inline">£{{ cart_total|default:'0.00' }}</span>
@@ -522,10 +305,10 @@
         </div>
       </div>
 
+      <!-- nav -->
       <div class="nav-row">
         <div class="nav-left">
-          <button class="btn-brand tap" type="button"
-                  onclick="document.getElementById('categorySidebar').classList.add('open')">
+          <button class="btn-brand tap" type="button" onclick="document.getElementById('categorySidebar').classList.add('open')">
             <i class="fa fa-bars"></i> Categories
           </button>
 
@@ -536,19 +319,15 @@
           <a href="{% url 'order_history' %}" class="nav-linkx {% if request.resolver_match.url_name == 'order_history' %}active{% endif %}">My Orders</a>
         </div>
 
+        <!-- store selector -->
         <div class="nav-right">
           {% if all_stores %}
             <form method="post" action="{% url 'change_store_in_nav' %}" class="store-form">
               {% csrf_token %}
-              <span class="store-label">
-                <i class="fa fa-store"></i> Store:
-              </span>
-              <select name="store_key" class="form-select form-select-sm tap store-select"
-                      onchange="this.form.submit()">
+              <span class="store-label"><i class="fa fa-store"></i> Store:</span>
+              <select name="store_key" class="form-select form-select-sm tap store-select" onchange="this.form.submit()">
                 {% for store in all_stores %}
-                  <option value="{{ store.key }}" {% if store == selected_store %}selected{% endif %}>
-                    {{ store.name }}
-                  </option>
+                  <option value="{{ store.key }}" {% if store == selected_store %}selected{% endif %}>{{ store.name }}</option>
                 {% endfor %}
               </select>
               <a class="btn btn-sm btn-outline-dark tap store-btn" href="{% url 'select_store' %}">Change</a>
@@ -561,7 +340,7 @@
     </div>
   </header>
 
-  <!-- ===== Cart Drawer ===== -->
+  <!-- cart drawer -->
   <div id="cartDrawer" class="cart-drawer">
     <div class="cart-drawer-header">
       <span>Your Cart</span>
@@ -591,12 +370,11 @@
     });
   </script>
 
-  <!-- ===== Category Sidebar ===== -->
+  <!-- category sidebar -->
   <div id="categorySidebar">
     <div class="sidebar-header">
       <span>All Categories</span>
-      <button class="btn btn-sm btn-outline-secondary tap"
-              onclick="document.getElementById('categorySidebar').classList.remove('open')">&times;</button>
+      <button class="btn btn-sm btn-outline-secondary tap" onclick="document.getElementById('categorySidebar').classList.remove('open')">&times;</button>
     </div>
     <div class="sidebar-categories">
       {% for category in categories %}
@@ -614,7 +392,7 @@
     });
   </script>
 
-  <!-- ===== Promo Banner ===== -->
+  <!-- banner -->
   <div class="promo-banner">
     {% if banners|length > 0 %}
       <div id="promoCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -635,27 +413,24 @@
         {% endif %}
       </div>
     {% else %}
-      <!-- FIXED: your repo has banner1.png -->
+      <!-- fallback banner from git demo folder -->
       <img src="{% static 'demo/banners/banner1.png' %}" class="promo-banner-img" alt="Promo Banner">
     {% endif %}
   </div>
 
-  <!-- ===== Main ===== -->
-  <main id="pageMain">
-    <div class="container py-3">
+  <main>
+    <div class="container">
       {% block content %}{% endblock %}
     </div>
   </main>
 
-  <!-- ===== Footer ===== -->
+  <!-- footer -->
   <footer>
     <div class="container">
       <div class="footer-grid reveal">
         <div>
           <div class="footer-title">Spicexpress</div>
-          <div style="font-weight:800; opacity:.95;">
-            Fresh groceries, spices & essentials delivered to your door.
-          </div>
+          <div style="font-weight:800; opacity:.95;">Fresh groceries, spices & essentials delivered to your door.</div>
           <div class="mt-3 social">
             <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
             <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
@@ -699,7 +474,7 @@
     </div>
   </footer>
 
-  <!-- ===== Scroll reveal JS ===== -->
+  <!-- reveal js -->
   <script>
     let revealObserver;
     function hookReveal(){
@@ -717,24 +492,6 @@
       els.forEach(el => revealObserver.observe(el));
     }
     document.addEventListener('DOMContentLoaded', hookReveal);
-
-    // ===== FIX: sticky header shouldn't cover content (desktop/tablet only) =====
-    function syncMainOffset(){
-      const header = document.getElementById('siteHeader');
-      const main = document.getElementById('pageMain');
-      if (!header || !main) return;
-
-      const isMobile = window.matchMedia('(max-width: 560px)').matches;
-      if (isMobile){
-        main.style.paddingTop = '0px';
-        return;
-      }
-      // header is sticky on desktop/tablet: add safe padding
-      const h = header.offsetHeight || 0;
-      main.style.paddingTop = (h ? (h + 8) : 0) + 'px';
-    }
-    window.addEventListener('load', syncMainOffset);
-    window.addEventListener('resize', syncMainOffset);
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
