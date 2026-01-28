@@ -5,249 +5,525 @@
   <meta charset="UTF-8">
   <title>{% block title %}Spicexpress{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/png" href="{% static 'logo.png' %}">
+
+  <!-- Use a crisp favicon (optional) -->
+  <link rel="icon" type="image/png" href="{% static 'spicexpress_logo.png' %}">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- ======================== SITEWIDE STYLES ======================== -->
   <style>
-    :root {
-      --red: #f77d1b;
-      --deep-red: #d11304;
-      --cream: #fffaf6;
-      --black: #111;
-      --veg-green: #21b344;
-      --nonveg-red: #d11304;
+    :root{
+      --brand: #f77d1b;
+      --brand-strong:#d11304;
+      --bg:#fffaf6;
+      --text:#111;
+      --muted:#6b7280;
+      --card:#ffffff;
+      --radius:18px;
+      --shadow: 0 14px 36px rgba(17,17,17,0.08);
+      --shadow-soft: 0 10px 26px rgba(17,17,17,0.06);
+      --stroke: rgba(0,0,0,0.06);
     }
-    html, body { background: var(--cream); font-family: 'Inter', 'Montserrat', Arial, sans-serif; color: var(--black); margin: 0; padding: 0; }
-    /* ---------- TOP BAR ---------- */
-    .top-bar { background: #222; color: #fff; font-size: 1rem; padding: 5px 0; width: 100%; letter-spacing: 0.01em; }
-    .top-bar .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
-    .top-bar a { color: #fff; text-decoration: underline; }
-    /* ---------- HEADER ---------- */
-    header { background: #fff; border-bottom: 1.5px solid #f3ece6; box-shadow: 0 2px 10px #f1ede7b0; z-index: 50; }
-    .header-row { display: flex; align-items: center; justify-content: center; padding: 0.7rem 1.4rem; gap: 14px; min-height: 86px;}
-    .logo-search-wrap { display: flex; align-items: center; justify-content: center; flex: 1; gap: 36px;}
-    .brand-logo-xl { height: 120px; width: auto; max-width: 210px; object-fit: contain; display: block; margin-right: 6vw; margin-left: 6px; background: #fff; transition: height 0.2s;}
-    .header-searchbar { flex: 1 1 350px; display: flex; justify-content: flex-start; align-items: center; min-width: 220px; max-width: 700px;}
-    .search-form { background: #fff; border-radius: 30px; display: flex; align-items: center; box-shadow: 0 1px 12px #f3ece6a8; width: 100%; max-width: 530px; min-width: 200px; border: 2px solid var(--red); overflow: hidden;}
-    .search-select { border: none; background: #fff; font-family: inherit; font-size: 1rem; font-weight: 500; color: var(--black); padding: 10px 16px; outline: none;}
-    .search-input { border: none; outline: none; background: #fff; font-size: 1rem; flex: 1 1 120px; padding: 10px 9px;}
-    .search-btn { border: none; background: var(--red); color: #fff; font-size: 1.3rem; font-weight: 700; border-radius: 0 30px 30px 0; padding: 9px 22px 9px 18px; transition: background 0.13s;}
-    .search-btn:hover { background: var(--deep-red);}
-    .header-icons { display: flex; align-items: center; justify-content: flex-end; min-width: 200px; gap: 8px; margin-left: auto; }
-    .header-icons .icon-btn { color: #111; margin-left: 10px; font-size: 1.3rem; position: relative; text-decoration: none;}
-    .header-icons .cart-total { font-size: 1.03em; font-weight: 700; margin-left: 7px;}
-    .cart-badge { position: absolute; top: -7px; right: -12px; background: #e31b23; color: #fff; font-size: 0.85em; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; box-shadow: 0 2px 6px #efb3b3a1; z-index: 2;}
-    .wishlist-badge { position: absolute; top: -7px; right: -12px; background: #e31b23; color: #fff; font-size: 0.83em; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; z-index: 2;}
-    .header-icons .login-btn, .header-icons .logout-btn { color: var(--deep-red); font-weight: 600; margin-left: 18px; text-decoration: none;}
-    /* ---------- NAV ---------- */
-    .nav-row { border-top: 1px solid #f3ece6; padding: 0.44rem 1.4rem; display: flex; align-items: center; gap: 34px;}
-    .nav-categories-btn { font-weight: 600; font-size: 1.05rem; color: #111; background: none; border: none; display: flex; align-items: center; gap: 8px; padding: 6px 12px; transition: background 0.12s;}
-    .nav-categories-btn:hover { background: #faede2; border-radius: 7px; }
-    .nav-links { display: flex; align-items: center; gap: 26px;}
-    .nav-link { color: #111; font-weight: 500; font-size: 1.06rem; text-decoration: none; transition: color 0.13s;}
-    .nav-link:hover, .nav-link.active { color: var(--red);}
-    /* ---------- CATEGORY SIDEBAR ---------- */
-    #categorySidebar { position: fixed; top: 0; left: -320px; width: 320px; max-width: 90vw; height: 100vh; background: #fff; z-index: 9999; box-shadow: 2px 0 12px #ddd; transition: all 0.27s; overflow-y: auto;}
-    #categorySidebar.open { left: 0; }
-    .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.2rem; border-bottom: 1px solid #f1ede7; font-weight: 600; font-size: 1.16rem;}
-    .sidebar-categories { padding: 1rem 1rem; }
-    .sidebar-categories a { display: block; padding: 10px 0; color: #111; font-weight: 500; font-size: 1.08rem; text-decoration: none; border-bottom: 1px solid #f9f4ee; transition: color 0.13s;}
-    .sidebar-categories a:hover { color: var(--red);}
-    /* ---------- BANNER CAROUSEL ---------- */
-    .promo-banner { width: 100vw; min-height: 420px; height: 420px; background: var(--cream); display: flex; align-items: stretch; justify-content: center; position: relative; overflow: hidden;}
-    .carousel-inner { width: 100vw; min-height: 420px; height: 420px; max-height: 520px;}
-    .promo-banner-img { width: 100vw; height: 100%; min-height: 420px; max-height: 520px; object-fit: cover; object-position: center; position: absolute; left: 0; top: 0; z-index: 0; filter: brightness(0.97);}
-    .promo-content { position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 54px 18px 48px 18px; color: var(--black);}
-    .promo-desc { font-size: 1.23rem; font-family: 'Inter', sans-serif; margin-bottom: 1.6rem; color: var(--black);}
-    .promo-btn { background: var(--red); color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.15rem; border: none; border-radius: 20px; padding: 0.7rem 2.1rem; margin-top: 0.8rem; box-shadow: 0 2px 12px #f8dcc43a; transition: background 0.14s;}
-    .promo-btn:hover { background: var(--deep-red);}
-    /* ---------- CART DRAWER ---------- */
-    .cart-drawer { position: fixed; right: -410px; top: 0; width: 410px; max-width: 95vw; height: 100vh; background: #fff; box-shadow: -4px 0 16px #0002; z-index: 10000; transition: right 0.28s;}
-    .cart-drawer.open { right: 0;}
-    .cart-drawer-header { font-weight: 700; font-size: 1.25rem; padding: 16px 22px; border-bottom: 1px solid #f1ede7;}
-    .cart-drawer-items { max-height: 60vh; overflow-y: auto; padding: 22px;}
-    .cart-drawer-footer { border-top: 1px solid #f1ede7; padding: 20px 22px;}
-    /* ---------- CATEGORY GRID & CARD (for home page) ---------- */
-    .category-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 26px 22px;
-      justify-content: flex-start;
-      margin-top: 10px;
-      margin-bottom: 22px;
+
+    html,body{ background:var(--bg); color:var(--text); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+
+    /* ===== Global micro-interactions ===== */
+    .tap{ transition: transform 140ms ease, box-shadow 140ms ease; }
+    .tap:active{ transform: scale(0.98); }
+    .hover-lift{ transition: transform 220ms ease, box-shadow 220ms ease; }
+    .hover-lift:hover{ transform: translateY(-3px); box-shadow: var(--shadow); }
+
+    /* ===== Scroll reveal ===== */
+    .reveal{
+      opacity:0;
+      transform: translateY(14px);
+      transition: opacity 520ms ease, transform 520ms ease;
+      will-change: opacity, transform;
     }
-    .category-card {
-      flex: 0 1 200px;
+    .reveal.in-view{
+      opacity:1;
+      transform: translateY(0);
+    }
+
+    /* ===== Top bar ===== */
+    .top-bar{
+      background:#121212;
+      color:#fff;
+      font-size:0.98rem;
+      padding:7px 0;
+      letter-spacing:0.01em;
+    }
+    .top-bar .container{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .top-bar .pill-top{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.12);
+      font-weight:800;
+    }
+    .top-bar a{ color:#fff; text-decoration:none; font-weight:800; }
+    .top-bar a:hover{ text-decoration:underline; }
+
+    /* ===== Sticky header (modern) ===== */
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255,255,255,0.86);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      box-shadow: 0 8px 22px rgba(17,17,17,0.06);
+    }
+
+    .header-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding: 12px 14px;
+    }
+
+    /* Logo */
+    .brand-wrap{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 220px;
+    }
+    .brand-logo{
+      height:64px;
+      width:auto;
+      max-width: 260px;
+      object-fit:contain;
+      display:block;
+      filter: drop-shadow(0 6px 16px rgba(17,17,17,0.10));
+      transition: transform 220ms ease;
+    }
+    .brand-wrap:hover .brand-logo{ transform: translateY(-1px); }
+
+    /* Search */
+    .header-search{
+      flex: 1 1 520px;
+      display:flex;
+      justify-content:center;
+    }
+    .search-form{
+      width:100%;
+      max-width: 720px;
+      display:flex;
+      align-items:center;
+      overflow:hidden;
+      border-radius:999px;
+      background:#fff;
+      border:2px solid rgba(247,125,27,0.55);
+      box-shadow: 0 10px 26px rgba(247,125,27,0.10);
+    }
+    .search-select{
+      border:none;
+      outline:none;
+      padding: 12px 14px;
+      font-weight:800;
+      color:var(--text);
       background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 2px 14px #eee;
-      border: 1px solid #f1ede7;
-      text-align: center;
-      text-decoration: none;
-      transition: box-shadow 0.17s, border 0.14s;
-      min-width: 160px;
-      max-width: 225px;
-      margin-bottom: 15px;
-      position: relative;
-      padding-bottom: 14px;
+      max-width: 190px;
     }
-    .category-card:hover {
-      box-shadow: 0 4px 18px #ffd7b5cc;
-      border: 1.3px solid var(--red);
+    .search-input{
+      border:none;
+      outline:none;
+      flex:1;
+      padding: 12px 14px;
+      font-weight:700;
     }
-    .cat-img-wrap {
-      width: 100%;
-      padding-top: 14px;
-      padding-bottom: 7px;
+    .search-btn{
+      border:none;
+      outline:none;
+      background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+      color:#fff;
+      padding: 12px 18px;
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      gap:8px;
     }
-    .cat-img {
-      width: 95%;
-      height: 105px;
-      object-fit: contain;
-      border-radius: 13px;
-      margin-bottom: 6px;
-      background: #faf6f2;
+    .search-btn:hover{ filter: brightness(1.02); }
+
+    /* Header actions */
+    .header-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width: 220px;
+      justify-content:flex-end;
     }
-    .cat-title {
-      color: #111 !important;
-      font-weight: 600;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 1.12rem;
-      margin-bottom: 2px;
-      margin-top: 6px;
-      letter-spacing: 0.1px;
+
+    .icon-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 10px 12px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid rgba(0,0,0,0.07);
+      box-shadow: var(--shadow-soft);
+      text-decoration:none;
+      color:var(--text);
+      font-weight:900;
     }
-    /* ---------- FOOTER ---------- */
-    footer { background: var(--red); color: #fff;}
-    @media (max-width: 1100px) {
-      .logo-search-wrap { flex-direction: column; gap: 10px; }
-      .brand-logo-xl { height: 60px; margin-right: 0; margin-bottom: 14px;}
-      .header-row { flex-direction: column; gap: 8px;}
-      .category-grid { justify-content: center; }
+    .icon-pill i{ color: var(--brand-strong); }
+
+    .cart-badge{
+      position:absolute;
+      top:-7px;
+      right:-10px;
+      background:#e31b23;
+      color:#fff;
+      font-size:0.82rem;
+      min-width:20px;
+      height:20px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      box-shadow: 0 6px 14px rgba(227,27,35,0.25);
     }
-    @media (max-width: 700px) {
-      .brand-logo-xl { height: 38px; margin-bottom: 10px;}
-      .header-row { flex-direction: column; gap: 6px;}
-      .header-searchbar { max-width: 90vw;}
-      .search-form { width: 100%; }
-      .cart-drawer { width: 100vw;}
-      .category-card { min-width: 110px; max-width: 98vw; }
-      .cat-img { height: 60px; }
+
+    /* ===== Nav row ===== */
+    .nav-row{
+      padding: 10px 14px 12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border-top: 1px solid rgba(0,0,0,0.05);
     }
-    @media (max-width: 900px) {
-      .promo-banner, .promo-banner-img, .carousel-inner { min-height: 190px; height: 190px; max-height: 240px;}
+
+    .nav-left{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .nav-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .nav-linkx{
+      text-decoration:none;
+      color:var(--text);
+      font-weight:900;
+      padding: 8px 10px;
+      border-radius:999px;
+      transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+    }
+    .nav-linkx:hover{
+      background: rgba(247,125,27,0.10);
+      color: var(--brand-strong);
+      transform: translateY(-1px);
+    }
+    .nav-linkx.active{
+      background: rgba(247,125,27,0.16);
+      color: var(--brand-strong);
+    }
+
+    .btn-brand{
+      background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+      color:#fff;
+      font-weight:900;
+      border:none;
+      padding: 10px 14px;
+      border-radius: 999px;
+      box-shadow: 0 12px 26px rgba(247,125,27,0.20);
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .btn-brand:hover{ filter: brightness(1.02); color:#fff; }
+
+    /* ===== Category sidebar ===== */
+    #categorySidebar{
+      position:fixed; top:0; left:-340px;
+      width:340px; max-width:90vw; height:100vh;
+      background:#fff; z-index:9999;
+      box-shadow: 10px 0 40px rgba(17,17,17,0.12);
+      transition: left 260ms ease;
+      overflow-y:auto;
+    }
+    #categorySidebar.open{ left:0; }
+    .sidebar-header{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 16px 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      font-weight:1000;
+      font-size: 1.1rem;
+    }
+    .sidebar-categories{ padding: 10px 16px 20px 16px; }
+    .sidebar-categories a{
+      display:block;
+      padding: 11px 0;
+      text-decoration:none;
+      color:var(--text);
+      font-weight:900;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .sidebar-categories a:hover{ color:var(--brand-strong); }
+
+    /* ===== Promo banner ===== */
+    .promo-banner{
+      width:100%;
+      min-height: 260px;
+      background: var(--bg);
+      position:relative;
+      overflow:hidden;
+    }
+    .promo-banner-img{
+      width:100%;
+      height: 420px;
+      object-fit: cover;
+      object-position: center;
+      filter: brightness(0.98);
+    }
+    @media (max-width: 900px){
+      .promo-banner-img{ height: 240px; }
+    }
+
+    /* ===== Cart drawer ===== */
+    .cart-drawer{
+      position:fixed; right:-420px; top:0;
+      width:420px; max-width:95vw; height:100vh;
+      background:#fff;
+      box-shadow: -10px 0 40px rgba(17,17,17,0.18);
+      z-index: 10000;
+      transition: right 280ms ease;
+    }
+    .cart-drawer.open{ right:0; }
+    .cart-drawer-header{
+      font-weight:1000; font-size:1.2rem;
+      padding: 16px 18px;
+      border-bottom:1px solid rgba(0,0,0,0.06);
+    }
+    .cart-drawer-items{ max-height: 62vh; overflow:auto; padding: 16px 18px; }
+    .cart-drawer-footer{ border-top:1px solid rgba(0,0,0,0.06); padding: 16px 18px; }
+
+    /* ===== Footer ===== */
+    footer{
+      background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+      color:#fff;
+      margin-top: 30px;
+    }
+    .footer-grid{
+      display:grid;
+      grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
+      gap: 18px;
+      padding: 30px 0 18px 0;
+    }
+    .footer-title{
+      font-weight:1000;
+      margin-bottom: 10px;
+      font-size: 1.05rem;
+    }
+    .footer-link{
+      color:#fff;
+      text-decoration:none;
+      display:block;
+      padding: 4px 0;
+      font-weight:800;
+      opacity: 0.95;
+    }
+    .footer-link:hover{ text-decoration: underline; opacity: 1; }
+    .footer-bottom{
+      border-top: 1px solid rgba(255,255,255,0.22);
+      padding: 14px 0;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      gap:10px;
+      font-weight:800;
+    }
+    .social a{
+      color:#fff;
+      text-decoration:none;
+      font-size: 1.15rem;
+      margin-right: 10px;
+      opacity: 0.95;
+    }
+    .social a:hover{ opacity: 1; transform: translateY(-1px); }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 992px){
+      .header-row{ flex-wrap:wrap; }
+      .brand-wrap{ min-width: 180px; }
+      .brand-logo{ height:56px; }
+      .header-search{ order: 3; flex: 1 1 100%; }
+      .header-actions{ order: 2; }
+      .footer-grid{ grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 560px){
+      .brand-logo{ height:48px; }
+      .search-select{ display:none; } /* cleaner mobile search */
+      .footer-grid{ grid-template-columns: 1fr; }
     }
   </style>
+
   {% block extra_head %}{% endblock %}
 </head>
+
 <body>
-  <!-- ====== TOP BAR ====== -->
+
+  <!-- ===== Top bar ===== -->
   <div class="top-bar">
     <div class="container">
-      <span>
-        <i class="fa fa-phone"></i> 077000000 &nbsp; | &nbsp;
-        <i class="fa fa-envelope"></i>
-        <a href="mailto:spicexpress@gmail.com">spicexpress@gmail.com</a>
-      </span>
-      <span>
+      <div class="pill-top">
+        <i class="fa fa-truck"></i>
+        Free next-day delivery <span style="opacity:.9;">(6pm–9pm)</span>
+      </div>
+
+      <div class="d-flex align-items-center gap-3 flex-wrap">
+        <span class="pill-top">
+          <i class="fa fa-store"></i> In-store pickup: Wigan & Southport
+        </span>
+
         {% if user.is_authenticated %}
-          <a href="{% url 'account_logout' %}"><i class="fa fa-sign-out-alt"></i> Logout</a>
+          <a href="{% url 'account_logout' %}"><i class="fa fa-sign-out-alt me-1"></i>Logout</a>
         {% else %}
-          <a href="{% url 'account_login' %}"><i class="fa fa-sign-in-alt"></i> Sign In</a>
-          &nbsp;|&nbsp;
-          <a href="{% url 'account_signup' %}"><i class="fa fa-user-plus"></i> Sign Up</a>
+          <a href="{% url 'account_login' %}"><i class="fa fa-sign-in-alt me-1"></i>Sign In</a>
+          <span style="opacity:.7;">|</span>
+          <a href="{% url 'account_signup' %}"><i class="fa fa-user-plus me-1"></i>Sign Up</a>
         {% endif %}
-      </span>
+      </div>
     </div>
   </div>
 
-  <!-- ====== HEADER ====== -->
+  <!-- ===== Header ===== -->
   <header>
-    <div class="header-row">
-      <div class="logo-search-wrap">
-        <a href="{% url 'home' %}" style="text-decoration:none;">
-          <img src="{% static 'logo.png' %}" class="brand-logo-xl" alt="Spicexpress logo">
+    <div class="container">
+      <div class="header-row">
+        <a class="brand-wrap tap" href="{% url 'home' %}" style="text-decoration:none;">
+          <img src="{% static 'spicexpress_logo.png' %}" class="brand-logo" alt="Spicexpress logo">
         </a>
-        <div class="header-searchbar">
-          <form class="search-form" action="{% url 'search' %}" method="get" role="search">
+
+        <div class="header-search">
+          <form class="search-form tap" action="{% url 'search' %}" method="get" role="search">
             <select name="category" class="search-select">
               <option value="">All Categories</option>
               {% for category in categories %}
                 <option value="{{ category.id }}">{{ category.name }}</option>
               {% endfor %}
             </select>
-            <input type="text" name="q" class="search-input" placeholder="Search for products ..." aria-label="Search" required>
-            <button class="search-btn" type="submit"><i class="fa fa-search"></i></button>
+            <input type="text" name="q" class="search-input" placeholder="Search products…" aria-label="Search" required>
+            <button class="search-btn tap" type="submit">
+              <i class="fa fa-search"></i> <span class="d-none d-sm-inline">Search</span>
+            </button>
           </form>
         </div>
-      </div>
-      <div class="header-icons">
-        {% if user.is_authenticated %}
-          <a href="#" class="icon-btn"><i class="fa fa-user"></i> Account</a>
-        {% else %}
-          <a href="{% url 'account_login' %}" class="icon-btn login-btn"><i class="fa fa-user"></i> Login</a>
-        {% endif %}
-        <a href="#" class="icon-btn position-relative"><i class="fa fa-heart"></i></a>
-        <a href="#" class="icon-btn position-relative" onclick="openCartDrawer();return false;">
-          <i class="fa fa-shopping-cart"></i>
-          {% if cart_count|default:0 > 0 %}
-            <span class="cart-badge">{{ cart_count }}</span>
-          {% endif %}
-          <span class="cart-total">£{{ cart_total|default:'0.00' }}</span>
-        </a>
-      </div>
-    </div>
-    <div class="nav-row">
-      <button class="nav-categories-btn" onclick="document.getElementById('categorySidebar').classList.add('open')">
-        <i class="fa fa-bars"></i> Browse All Categories
-      </button>
-      <div class="nav-links">
-        <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
-        <a href="{% url 'about_us' %}" class="nav-link {% if request.resolver_match.url_name == 'about_us' %}active{% endif %}">About Us</a>
-        <a href="{% url 'deals' %}" class="nav-link {% if request.resolver_match.url_name == 'deals' %}active{% endif %}">Deals</a>
-        <a href="{% url 'best_sellers' %}" class="nav-link {% if request.resolver_match.url_name == 'best_sellers' %}active{% endif %}">Best-sellers</a>
-        <a href="{% url 'order_history' %}" class="nav-link {% if request.resolver_match.url_name == 'order_history' %}active{% endif %}">My Orders</a>
-{% if selected_store %}
-  <div class="text-muted small">
-    Store: <strong>{{ selected_store.name }}</strong> 
-    (<a href="{% url 'select_store' %}">Change</a>)
-  </div>
-{% else %}
-  <div class="text-danger small">
-    No store selected. <a href="{% url 'select_store' %}">Select Store</a>
-  </div>
-{% endif %}
-<form method="post" action="{% url 'change_store_in_nav' %}" class="d-flex align-items-center ms-3">
-  {% csrf_token %}
-  <select name="store_key" class="form-select form-select-sm" onchange="this.form.submit()">
-    {% for store in all_stores %}
-      <option value="{{ store.key }}" {% if store == selected_store %}selected{% endif %}>
-        {{ store.name }}
-      </option>
-    {% endfor %}
-  </select>
-</form>
 
+        <div class="header-actions">
+          <!-- Account dropdown -->
+          <div class="dropdown">
+            <a class="icon-pill tap dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa fa-user"></i>
+              <span class="d-none d-sm-inline">
+                {% if user.is_authenticated %}Account{% else %}Sign in{% endif %}
+              </span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              {% if user.is_authenticated %}
+                <li><a class="dropdown-item" href="#"><i class="fa fa-user me-2"></i>Profile</a></li>
+                <li><a class="dropdown-item" href="{% url 'order_history' %}"><i class="fa fa-receipt me-2"></i>My Orders</a></li>
+                <li><a class="dropdown-item" href="/admin/"><i class="fa fa-gear me-2"></i>Admin</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="{% url 'account_logout' %}"><i class="fa fa-sign-out-alt me-2"></i>Logout</a></li>
+              {% else %}
+                <li><a class="dropdown-item" href="{% url 'account_login' %}"><i class="fa fa-sign-in-alt me-2"></i>Login</a></li>
+                <li><a class="dropdown-item" href="{% url 'account_signup' %}"><i class="fa fa-user-plus me-2"></i>Sign up</a></li>
+              {% endif %}
+            </ul>
+          </div>
+
+          <!-- Cart -->
+          <a href="#" class="icon-pill tap position-relative" onclick="openCartDrawer();return false;">
+            <i class="fa fa-shopping-cart"></i>
+            <span class="d-none d-sm-inline">£{{ cart_total|default:'0.00' }}</span>
+            {% if cart_count|default:0 > 0 %}
+              <span class="cart-badge">{{ cart_count }}</span>
+            {% endif %}
+          </a>
+        </div>
+      </div>
+
+      <!-- Nav -->
+      <div class="nav-row">
+        <div class="nav-left">
+          <button class="btn-brand tap" type="button"
+                  onclick="document.getElementById('categorySidebar').classList.add('open')">
+            <i class="fa fa-bars"></i> Categories
+          </button>
+
+          <a href="{% url 'home' %}" class="nav-linkx {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
+          <a href="{% url 'about_us' %}" class="nav-linkx {% if request.resolver_match.url_name == 'about_us' %}active{% endif %}">About</a>
+          <a href="{% url 'deals' %}" class="nav-linkx {% if request.resolver_match.url_name == 'deals' %}active{% endif %}">Deals</a>
+          <a href="{% url 'best_sellers' %}" class="nav-linkx {% if request.resolver_match.url_name == 'best_sellers' %}active{% endif %}">Best-sellers</a>
+          <a href="{% url 'order_history' %}" class="nav-linkx {% if request.resolver_match.url_name == 'order_history' %}active{% endif %}">My Orders</a>
+        </div>
+
+        <!-- Store selector moved to NAV RIGHT (as requested) -->
+        <div class="nav-right">
+          {% if all_stores %}
+            <form method="post" action="{% url 'change_store_in_nav' %}" class="d-flex align-items-center gap-2">
+              {% csrf_token %}
+              <span class="fw-bold" style="color:var(--text); opacity:.75;">
+                <i class="fa fa-store me-1"></i>Store:
+              </span>
+              <select name="store_key" class="form-select form-select-sm tap" style="min-width:170px;"
+                      onchange="this.form.submit()">
+                {% for store in all_stores %}
+                  <option value="{{ store.key }}" {% if store == selected_store %}selected{% endif %}>
+                    {{ store.name }}
+                  </option>
+                {% endfor %}
+              </select>
+              <a class="btn btn-sm btn-outline-dark tap" href="{% url 'select_store' %}">Select</a>
+            </form>
+          {% else %}
+            <a class="btn btn-sm btn-outline-dark tap" href="{% url 'select_store' %}">Select Store</a>
+          {% endif %}
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- ====== CART DRAWER (GLOBAL, AJAX) ====== -->
+  <!-- ===== Cart Drawer ===== -->
   <div id="cartDrawer" class="cart-drawer">
     <div class="cart-drawer-header">
       <span>Your Cart</span>
-      <button class="btn btn-sm btn-danger float-end" onclick="closeCartDrawer()">&times;</button>
+      <button class="btn btn-sm btn-danger float-end tap" onclick="closeCartDrawer()">&times;</button>
     </div>
     <div class="cart-drawer-items" id="cartDrawerItems">
-      <!-- AJAX-loaded content from cart_drawer.html will appear here -->
+      <!-- AJAX content -->
     </div>
     <div class="cart-drawer-footer">
-      <a href="{% url 'cart' %}" class="btn btn-success w-100">Go to Cart & Checkout</a>
+      <a href="{% url 'cart' %}" class="btn btn-success w-100 tap">Go to Cart & Checkout</a>
     </div>
   </div>
+
   <script>
     function openCartDrawer() {
       document.getElementById('cartDrawer').classList.add('open');
@@ -255,6 +531,7 @@
         .then(resp => resp.json())
         .then(data => {
           document.getElementById('cartDrawerItems').innerHTML = data.html;
+          hookReveal(); // ensure newly injected content animates if needed
         });
     }
     function closeCartDrawer() {
@@ -265,11 +542,12 @@
     });
   </script>
 
-  <!-- ====== CATEGORY SIDEBAR (OFFCANVAS) ====== -->
+  <!-- ===== Category Sidebar ===== -->
   <div id="categorySidebar">
     <div class="sidebar-header">
       <span>All Categories</span>
-      <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('categorySidebar').classList.remove('open')">&times;</button>
+      <button class="btn btn-sm btn-outline-secondary tap"
+              onclick="document.getElementById('categorySidebar').classList.remove('open')">&times;</button>
     </div>
     <div class="sidebar-categories">
       {% for category in categories %}
@@ -277,17 +555,17 @@
       {% endfor %}
     </div>
   </div>
+
   <script>
-    // Close category sidebar on click outside or close button
     document.addEventListener('click', function(e){
-      var sidebar = document.getElementById('categorySidebar');
-      if(sidebar.classList.contains('open') && !sidebar.contains(e.target) && !e.target.matches('.nav-categories-btn, .fa-bars')) {
-        sidebar.classList.remove('open');
-      }
+      const sidebar = document.getElementById('categorySidebar');
+      const isOpen = sidebar.classList.contains('open');
+      const clickedBtn = e.target.closest('.btn-brand');
+      if (isOpen && !sidebar.contains(e.target) && !clickedBtn) sidebar.classList.remove('open');
     });
   </script>
 
-  <!-- ====== PROMO BANNER (CAROUSEL) ====== -->
+  <!-- ===== Promo Banner ===== -->
   <div class="promo-banner">
     {% if banners|length > 0 %}
       <div id="promoCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -295,24 +573,16 @@
           {% for banner in banners %}
             <div class="carousel-item {% if forloop.first %}active{% endif %}">
               <img src="{{ banner.image.url }}" alt="{{ banner.title }}" class="promo-banner-img">
-              <div class="promo-content">
-                {% if banner.description %}
-                  <div class="promo-desc">{{ banner.description }}</div>
-                {% endif %}
-                {% if banner.cta_url %}
-                  <a href="{{ banner.cta_url }}" class="promo-btn">{{ banner.cta_label|default:"Shop Now" }}</a>
-                {% endif %}
-              </div>
             </div>
           {% endfor %}
         </div>
         {% if banners|length > 1 %}
-        <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel" data-bs-slide="next">
-          <span class="carousel-control-next-icon"></span>
-        </button>
+          <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+          </button>
         {% endif %}
       </div>
     {% else %}
@@ -320,29 +590,85 @@
     {% endif %}
   </div>
 
-  <!-- ====== MAIN CONTENT ====== -->
+  <!-- ===== Main ===== -->
   <main>
     <div class="container py-3">
       {% block content %}{% endblock %}
     </div>
   </main>
 
-  <!-- ====== FOOTER ====== -->
-  <footer class="text-center py-4">
+  <!-- ===== Footer (upgraded) ===== -->
+  <footer>
     <div class="container">
-      <div>
-        <span>Contact: <a href="mailto:info@spicexpress.com" class="fw-bold text-white">info@spicexpress.com</a></span>
-        <span class="mx-3">|</span>
-        <span>Follow us: 
-          <a href="#" class="text-white"><i class="fab fa-facebook"></i></a> 
-          <a href="#" class="text-white ms-1"><i class="fab fa-instagram"></i></a>
-        </span>
+      <div class="footer-grid reveal">
+        <div>
+          <div class="footer-title">Spicexpress</div>
+          <div style="font-weight:800; opacity:.95;">
+            Fresh groceries, spices & essentials delivered to your door.
+          </div>
+          <div class="mt-3 social">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+
+        <div>
+          <div class="footer-title">Shop</div>
+          <a class="footer-link" href="{% url 'deals' %}">Deals</a>
+          <a class="footer-link" href="{% url 'best_sellers' %}">Best-sellers</a>
+          <a class="footer-link" href="{% url 'cart' %}">Cart</a>
+          <a class="footer-link" href="{% url 'order_history' %}">My Orders</a>
+        </div>
+
+        <div>
+          <div class="footer-title">Help</div>
+          <a class="footer-link" href="{% url 'about_us' %}">About</a>
+          <a class="footer-link" href="#">Delivery info (6pm–9pm)</a>
+          <a class="footer-link" href="#">Pickup locations</a>
+          <a class="footer-link" href="mailto:info@spicexpress.com">Contact support</a>
+        </div>
+
+        <div>
+          <div class="footer-title">Locations</div>
+          <div style="font-weight:900;">Wigan</div>
+          <div style="opacity:.95; font-weight:800;">In-store pickup available</div>
+          <div class="mt-2" style="font-weight:900;">Southport</div>
+          <div style="opacity:.95; font-weight:800;">In-store pickup available</div>
+
+          <div class="mt-3">
+            <div class="footer-title mb-1">Contact</div>
+            <a class="footer-link" href="mailto:info@spicexpress.com">info@spicexpress.com</a>
+          </div>
+        </div>
       </div>
-      <div class="pt-2" style="font-size:0.95em;">
-        &copy; {{ now|date:"Y" }} Spicexpress. All rights reserved.
+
+      <div class="footer-bottom">
+        <div>&copy; {{ now|date:"Y" }} Spicexpress. All rights reserved.</div>
+        <div>Built by <strong>Nixrix</strong></div>
       </div>
     </div>
   </footer>
+
+  <!-- ===== Scroll reveal JS ===== -->
+  <script>
+    let revealObserver;
+    function hookReveal(){
+      const els = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window)) {
+        els.forEach(el => el.classList.add('in-view'));
+        return;
+      }
+      if (revealObserver) revealObserver.disconnect();
+      revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) entry.target.classList.add('in-view');
+        });
+      }, { threshold: 0.12 });
+      els.forEach(el => revealObserver.observe(el));
+    }
+    document.addEventListener('DOMContentLoaded', hookReveal);
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   {% block extra_js %}{% endblock %}
 </body>
